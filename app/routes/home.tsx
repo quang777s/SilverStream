@@ -33,10 +33,18 @@ export default function Home() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   // Initialize filter states from URL parameters
-  const [searchTerm, setSearchTerm] = useState(searchParams.get("search") || "");
-  const [selectedGenre, setSelectedGenre] = useState(searchParams.get("genre") || "");
-  const [selectedYear, setSelectedYear] = useState(searchParams.get("year") || "");
-  const [selectedRating, setSelectedRating] = useState(searchParams.get("rating") || "");
+  const [searchTerm, setSearchTerm] = useState(
+    searchParams.get("search") || ""
+  );
+  const [selectedGenre, setSelectedGenre] = useState(
+    searchParams.get("genre") || ""
+  );
+  const [selectedYear, setSelectedYear] = useState(
+    searchParams.get("year") || ""
+  );
+  const [selectedRating, setSelectedRating] = useState(
+    searchParams.get("rating") || ""
+  );
 
   // Update URL when filters change
   useEffect(() => {
@@ -45,9 +53,15 @@ export default function Home() {
     if (selectedGenre) params.set("genre", selectedGenre);
     if (selectedYear) params.set("year", selectedYear);
     if (selectedRating) params.set("rating", selectedRating);
-    
+
     setSearchParams(params, { replace: true });
-  }, [searchTerm, selectedGenre, selectedYear, selectedRating, setSearchParams]);
+  }, [
+    searchTerm,
+    selectedGenre,
+    selectedYear,
+    selectedRating,
+    setSearchParams,
+  ]);
 
   // Update filters from URL when it changes (e.g., browser back/forward)
   useEffect(() => {
@@ -90,8 +104,8 @@ export default function Home() {
     const allYears = new Set<string>();
     const allRatings = new Set<string>();
 
-    moviesData.movies.forEach(movie => {
-      movie.genres.forEach(genre => allGenres.add(genre));
+    moviesData.movies.forEach((movie) => {
+      movie.genres.forEach((genre) => allGenres.add(genre));
       allYears.add(movie.year);
       allRatings.add(movie.rating);
     });
@@ -99,7 +113,7 @@ export default function Home() {
     return {
       genres: Array.from(allGenres).sort(),
       years: Array.from(allYears).sort((a, b) => parseInt(b) - parseInt(a)),
-      ratings: Array.from(allRatings).sort()
+      ratings: Array.from(allRatings).sort(),
     };
   }, [moviesData]);
 
@@ -107,18 +121,18 @@ export default function Home() {
   const filteredMovies = useMemo(() => {
     if (!moviesData) return [];
 
-    return moviesData.movies.filter(movie => {
-      const matchesSearch = searchTerm === "" || 
+    return moviesData.movies.filter((movie) => {
+      const matchesSearch =
+        searchTerm === "" ||
         movie.title.toLowerCase().includes(searchTerm.toLowerCase());
-      
-      const matchesGenre = selectedGenre === "" || 
-        movie.genres.includes(selectedGenre);
-      
-      const matchesYear = selectedYear === "" || 
-        movie.year === selectedYear;
-      
-      const matchesRating = selectedRating === "" || 
-        movie.rating === selectedRating;
+
+      const matchesGenre =
+        selectedGenre === "" || movie.genres.includes(selectedGenre);
+
+      const matchesYear = selectedYear === "" || movie.year === selectedYear;
+
+      const matchesRating =
+        selectedRating === "" || movie.rating === selectedRating;
 
       return matchesSearch && matchesGenre && matchesYear && matchesRating;
     });
@@ -138,7 +152,9 @@ export default function Home() {
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading movies...</p>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">
+            Loading movies...
+          </p>
         </div>
       </div>
     );
@@ -168,7 +184,8 @@ export default function Home() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const hasActiveFilters = searchTerm || selectedGenre || selectedYear || selectedRating;
+  const hasActiveFilters =
+    searchTerm || selectedGenre || selectedYear || selectedRating;
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -176,9 +193,9 @@ export default function Home() {
       <div className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center gap-4">
-            <img 
-              src="/silver1.png" 
-              alt="SilverStream Logo" 
+            <img
+              src="/silver1.png"
+              alt="SilverStream Logo"
               className="h-16 w-auto"
             />
             <div>
@@ -186,8 +203,9 @@ export default function Home() {
                 SilverStream
               </h1>
               <p className="mt-2 text-gray-600 dark:text-gray-400">
-                Discover amazing movies from our collection of {moviesData.total_movies.toLocaleString()} titles
-                {hasActiveFilters && ` • ${filteredMovies.length} matching results`}
+                Discover amazing movies from our collection
+                {hasActiveFilters &&
+                  ` • ${filteredMovies.length} matching results`}
               </p>
             </div>
           </div>
@@ -197,8 +215,10 @@ export default function Home() {
       {/* Search and Filter Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Search & Filter</h2>
-          
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            Search & Filter
+          </h2>
+
           {/* Search Bar */}
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -225,8 +245,10 @@ export default function Home() {
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
               >
                 <option value="">All Genres</option>
-                {filterOptions.genres.map(genre => (
-                  <option key={genre} value={genre}>{genre}</option>
+                {filterOptions.genres.map((genre) => (
+                  <option key={genre} value={genre}>
+                    {genre}
+                  </option>
                 ))}
               </select>
             </div>
@@ -241,8 +263,10 @@ export default function Home() {
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
               >
                 <option value="">All Years</option>
-                {filterOptions.years.map(year => (
-                  <option key={year} value={year}>{year}</option>
+                {filterOptions.years.map((year) => (
+                  <option key={year} value={year}>
+                    {year}
+                  </option>
                 ))}
               </select>
             </div>
@@ -257,8 +281,10 @@ export default function Home() {
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
               >
                 <option value="">All Ratings</option>
-                {filterOptions.ratings.map(rating => (
-                  <option key={rating} value={rating}>{rating}</option>
+                {filterOptions.ratings.map((rating) => (
+                  <option key={rating} value={rating}>
+                    {rating}
+                  </option>
                 ))}
               </select>
             </div>
@@ -307,7 +333,8 @@ export default function Home() {
                       className="w-full h-full object-cover"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
-                        target.src = "https://via.placeholder.com/300x450/374151/9CA3AF?text=No+Image";
+                        target.src =
+                          "https://via.placeholder.com/300x450/374151/9CA3AF?text=No+Image";
                       }}
                     />
                     <div className="absolute top-2 right-2 bg-black bg-opacity-75 text-white text-xs px-2 py-1 rounded">
@@ -400,7 +427,9 @@ export default function Home() {
                 </div>
 
                 <div className="mt-4 text-sm text-gray-600 dark:text-gray-400">
-                  Page {currentPage} of {totalPages} • Showing {startIndex + 1}-{Math.min(endIndex, filteredMovies.length)} of {filteredMovies.length} movies
+                  Page {currentPage} of {totalPages} • Showing {startIndex + 1}-
+                  {Math.min(endIndex, filteredMovies.length)} of{" "}
+                  {filteredMovies.length} movies
                 </div>
               </div>
             )}

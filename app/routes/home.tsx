@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import { useSearchParams } from "react-router";
 
 interface Movie {
   title: string;
@@ -29,10 +30,32 @@ export default function Home() {
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedGenre, setSelectedGenre] = useState("");
-  const [selectedYear, setSelectedYear] = useState("");
-  const [selectedRating, setSelectedRating] = useState("");
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Initialize filter states from URL parameters
+  const [searchTerm, setSearchTerm] = useState(searchParams.get("search") || "");
+  const [selectedGenre, setSelectedGenre] = useState(searchParams.get("genre") || "");
+  const [selectedYear, setSelectedYear] = useState(searchParams.get("year") || "");
+  const [selectedRating, setSelectedRating] = useState(searchParams.get("rating") || "");
+
+  // Update URL when filters change
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (searchTerm) params.set("search", searchTerm);
+    if (selectedGenre) params.set("genre", selectedGenre);
+    if (selectedYear) params.set("year", selectedYear);
+    if (selectedRating) params.set("rating", selectedRating);
+    
+    setSearchParams(params, { replace: true });
+  }, [searchTerm, selectedGenre, selectedYear, selectedRating, setSearchParams]);
+
+  // Update filters from URL when it changes (e.g., browser back/forward)
+  useEffect(() => {
+    setSearchTerm(searchParams.get("search") || "");
+    setSelectedGenre(searchParams.get("genre") || "");
+    setSelectedYear(searchParams.get("year") || "");
+    setSelectedRating(searchParams.get("rating") || "");
+  }, [searchParams]);
 
   useEffect(() => {
     const loadMovies = async () => {
@@ -107,6 +130,7 @@ export default function Home() {
     setSelectedGenre("");
     setSelectedYear("");
     setSelectedRating("");
+    setCurrentPage(1);
   };
 
   if (loading) {
@@ -353,7 +377,7 @@ export default function Home() {
                         <button
                           key={pageNum}
                           onClick={() => handlePageChange(pageNum)}
-                          className={`px-3 py-2 text-sm font-medium rounded-md ${
+                          className={`px-3 py-2 text-sm font-medium rounded-md cursor-pointer ${
                             currentPage === pageNum
                               ? "bg-blue-600 text-white"
                               : "text-gray-500 bg-white border border-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700"

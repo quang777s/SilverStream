@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { useSearchParams } from "react-router";
+import { useSearchParams, Link } from "react-router";
 
 interface Movie {
   title: string;
@@ -9,6 +9,7 @@ interface Movie {
   url: string;
   image_url: string;
   video_source: string;
+  description: string;
 }
 
 interface MoviesData {
@@ -326,25 +327,35 @@ export default function Home() {
                   key={`${movie.title}-${startIndex + index}`}
                   className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
                 >
-                  <div className="aspect-[2/3] relative">
-                    <img
-                      src={movie.image_url}
-                      alt={movie.title}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.src =
-                          "https://via.placeholder.com/300x450/374151/9CA3AF?text=No+Image";
-                      }}
-                    />
-                    <div className="absolute top-2 right-2 bg-black bg-opacity-75 text-white text-xs px-2 py-1 rounded">
-                      {movie.rating}
+                  <Link
+                    to={`/movie/${encodeURIComponent(movie.title)}`}
+                    className="block"
+                  >
+                    <div className="aspect-[2/3] relative">
+                      <img
+                        src={movie.image_url}
+                        alt={movie.title}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.src =
+                            "https://via.placeholder.com/300x450/374151/9CA3AF?text=No+Image";
+                        }}
+                      />
+                      <div className="absolute top-2 right-2 bg-black bg-opacity-75 text-white text-xs px-2 py-1 rounded">
+                        {movie.rating}
+                      </div>
                     </div>
-                  </div>
+                  </Link>
                   <div className="p-4">
-                    <h3 className="font-semibold text-gray-900 dark:text-white text-sm mb-2 line-clamp-2">
-                      {movie.title}
-                    </h3>
+                    <Link
+                      to={`/movie/${encodeURIComponent(movie.title)}`}
+                      className="block hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                    >
+                      <h3 className="font-semibold text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 hover:text-blue-600 dark:hover:text-blue-400">
+                        {movie.title}
+                      </h3>
+                    </Link>
                     <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400 mb-2">
                       <span>{movie.year}</span>
                       <div className="flex flex-wrap gap-1 flex-row">
@@ -359,6 +370,12 @@ export default function Home() {
                       </div>
                     </div>
                     <div className="flex gap-2">
+                      <Link
+                        to={`/movie/${encodeURIComponent(movie.title)}`}
+                        className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-2 rounded text-center transition-colors"
+                      >
+                        Details
+                      </Link>
                       <a
                         href={movie.video_source}
                         target="_blank"

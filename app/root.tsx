@@ -28,6 +28,13 @@ export const links: Route.LinksFunction = () => [
   },
 ];
 
+export const headers: Route.HeadersFunction = () => {
+  return {
+    // Cache static assets for 1 year
+    "Cache-Control": "public, max-age=31536000, immutable",
+  };
+};
+
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">

@@ -194,11 +194,13 @@ export default function Home() {
       <div className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center gap-4">
-            <img
-              src="/silver1.png"
-              alt="SilverStream Logo"
-              className="h-16 w-auto"
-            />
+            <Link to="/">
+              <img
+                src="/silver1.png"
+                alt="SilverStream Logo"
+                className="h-16 w-auto"
+              />
+            </Link>
             <div>
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
                 SilverStream

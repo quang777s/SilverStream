@@ -41,6 +41,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="SilverStream" />
+        <meta property="og:image" content="/silver1.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:creator" content="@silverstream" />
+        <meta name="twitter:image" content="/silver1.png" />
+        <link rel="canonical" href="https://silver-stream.app" />
         <Meta />
         <Links />
       </head>

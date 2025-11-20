@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, Link } from "react-router";
+import { useParams, Link, useNavigate, useLocation } from "react-router";
 
 interface Movie {
   title: string;
@@ -26,6 +26,8 @@ export function meta() {
 
 export default function MovieDetail() {
   const { title } = useParams<{ title: string }>();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [movie, setMovie] = useState<Movie | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -100,11 +102,13 @@ export default function MovieDetail() {
       <div className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center gap-4">
-            <img
-              src="/silver1.png"
-              alt="SilverStream Logo"
-              className="h-16 w-auto"
-            />
+            <Link to="/">
+              <img
+                src="/silver1.png"
+                alt="SilverStream Logo"
+                className="h-16 w-auto"
+              />
+            </Link>
             <div>
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
                 SilverStream
@@ -119,9 +123,19 @@ export default function MovieDetail() {
 
       {/* Back Button */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <Link
-          to="/"
-          className="inline-flex items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200 transition-colors"
+        {/* Back button: use history.back when available so previous page (with its URL params) is restored */}
+        <button
+          onClick={() => {
+            // Use the from location in state (from Home) which includes search params
+            const from = (location.state as any)?.from;
+            if (from?.pathname) {
+              navigate(from.pathname + (from.search || ""));
+            } else {
+              // Default to home page if no previous state
+              navigate("/");
+            }
+          }}
+          className="inline-flex items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200 transition-colors bg-transparent border-0 p-0"
         >
           <svg
             className="w-4 h-4 mr-2"
@@ -138,7 +152,7 @@ export default function MovieDetail() {
             />
           </svg>
           Back to Movies
-        </Link>
+        </button>
       </div>
 
       {/* Movie Details */}
@@ -154,8 +168,7 @@ export default function MovieDetail() {
                   className="w-full h-full object-cover"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
-                    target.src =
-                      "https://via.placeholder.com/400x600/374151/9CA3AF?text=No+Image";
+                    target.src = "https://picsum.photos/200/300";
                   }}
                 />
                 <div className="absolute top-4 right-4 bg-black bg-opacity-75 text-white text-sm px-3 py-2 rounded-lg">

@@ -1,5 +1,5 @@
-import { useState, useEffect, useMemo } from "react";
-import { useSearchParams, Link } from "react-router";
+import { useState, useEffect, useMemo, useRef } from "react";
+import { useSearchParams, Link, useLocation } from "react-router";
 
 interface Movie {
   title: string;
@@ -28,10 +28,17 @@ const MOVIES_PER_PAGE = 20;
 
 export default function Home() {
   const [moviesData, setMoviesData] = useState<MoviesData | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
+  // read search params first
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // initialize current page from URL param `page` so pagination is reflected in the URL
+  const [currentPage, setCurrentPage] = useState(() => {
+    const p = parseInt((typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('page') : null) || "1", 10);
+    return Number.isNaN(p) || p < 1 ? 1 : p;
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchParams, setSearchParams] = useSearchParams();
+  
 
   // Initialize filter states from URL parameters
   const [searchTerm, setSearchTerm] = useState(
@@ -54,22 +61,29 @@ export default function Home() {
     if (selectedGenre) params.set("genre", selectedGenre);
     if (selectedYear) params.set("year", selectedYear);
     if (selectedRating) params.set("rating", selectedRating);
+    // include page param only when greater than 1 to keep URLs tidy
+    if (currentPage && currentPage > 1) params.set("page", String(currentPage));
 
-    setSearchParams(params, { replace: true });
+    setSearchParams(params);
   }, [
     searchTerm,
     selectedGenre,
     selectedYear,
     selectedRating,
+    currentPage,
     setSearchParams,
   ]);
 
   // Update filters from URL when it changes (e.g., browser back/forward)
   useEffect(() => {
+    ignoreFilterChangesFromURL.current = true;
     setSearchTerm(searchParams.get("search") || "");
     setSelectedGenre(searchParams.get("genre") || "");
     setSelectedYear(searchParams.get("year") || "");
     setSelectedRating(searchParams.get("rating") || "");
+    // sync page param too
+    const p = parseInt(searchParams.get("page") || "1", 10);
+    setCurrentPage(Number.isNaN(p) || p < 1 ? 1 : p);
   }, [searchParams]);
 
   useEffect(() => {
@@ -92,10 +106,26 @@ export default function Home() {
     loadMovies();
   }, []);
 
-  // Reset to first page when filters change
+  // Track initial mount to prevent reset on first load
+  const isInitialMount = useRef(true);
+  const ignoreFilterChangesFromURL = useRef(false);
+
+  // Reset to first page when filters change (after initial load)
   useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+
+    if (ignoreFilterChangesFromURL.current) return;
+
     setCurrentPage(1);
   }, [searchTerm, selectedGenre, selectedYear, selectedRating]);
+
+  // Reset URL change flag after state updates
+  useEffect(() => {
+    ignoreFilterChangesFromURL.current = false;
+  }, [searchTerm, selectedGenre, selectedYear, selectedRating, currentPage]);
 
   // Get unique values for filters
   const filterOptions = useMemo(() => {
@@ -182,11 +212,14 @@ export default function Home() {
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
+    // effect above will update the URL accordingly
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const hasActiveFilters =
     searchTerm || selectedGenre || selectedYear || selectedRating;
+
+  const location = useLocation();
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -331,6 +364,7 @@ export default function Home() {
                 >
                   <Link
                     to={`/movie/${encodeURIComponent(movie.title)}`}
+                    state={{ from: location }}
                     className="block"
                   >
                     <div className="aspect-[2/3] relative">
@@ -340,8 +374,7 @@ export default function Home() {
                         className="w-full h-full object-cover"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
-                          target.src =
-                            "https://via.placeholder.com/300x450/374151/9CA3AF?text=No+Image";
+                          target.src = "https://picsum.photos/200/300";
                         }}
                       />
                       <div className="absolute top-2 right-2 bg-black bg-opacity-75 text-white text-xs px-2 py-1 rounded">
@@ -352,6 +385,7 @@ export default function Home() {
                   <div className="p-4">
                     <Link
                       to={`/movie/${encodeURIComponent(movie.title)}`}
+                      state={{ from: location }}
                       className="block hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                     >
                       <h3 className="font-semibold text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 hover:text-blue-600 dark:hover:text-blue-400">
@@ -374,6 +408,7 @@ export default function Home() {
                     <div className="flex gap-2">
                       <Link
                         to={`/movie/${encodeURIComponent(movie.title)}`}
+                        state={{ from: location }}
                         className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-2 rounded text-center transition-colors"
                       >
                         Details
